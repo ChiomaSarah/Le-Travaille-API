@@ -54,10 +54,12 @@ router.get("/:user_id", async (req, res) => {
   }
 });
 
+// update a user's profile
 router.patch("/dashboard/:user_id", async (req, res) => {
   try {
     const { user_id } = req.params;
-    const { username, email, password, age, degree, experience, location } = req.body;
+    const { username, email, password, age, degree, experience, location } =
+      req.body;
 
     await pool.query(
       "update job_seeker set username = $1, email = $2, password = $3, age = $4, degree = $5, experience = $6, location = $7 where user_id = $8",
@@ -67,7 +69,7 @@ router.patch("/dashboard/:user_id", async (req, res) => {
           return res.json({
             status: 200,
             message: "Profile Updated!",
-            data: result.rows
+            data: result.rows,
           });
           // console.log(result.rows);
         } else {
@@ -76,13 +78,12 @@ router.patch("/dashboard/:user_id", async (req, res) => {
       }
     );
   } catch {
-    return res
-      .status(404)
-      .json({ error: "Profile does not exist!" });
+    return res.status(404).json({ error: "Profile does not exist!" });
   }
   pool.end;
 });
 
+// delete a user's profile
 router.delete("/dashboard/:user_id", async (req, res) => {
   try {
     const { user_id } = req.params;
@@ -97,9 +98,7 @@ router.delete("/dashboard/:user_id", async (req, res) => {
             data: result.rows,
           });
         } else {
-          return res
-            .status(404)
-            .json({ error: "Profile doesn't exist!" });
+          return res.status(404).json({ error: "Profile doesn't exist!" });
         }
       }
     );

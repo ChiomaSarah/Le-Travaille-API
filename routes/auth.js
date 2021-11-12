@@ -9,14 +9,11 @@ const verifyToken = require("../middleware/verifyToken.js");
 const cloudinary = require("../utils/cloudinary");
 const upload = require("../utils/multer");
 
+
 // register route
 router.post("/register", validEmail, async (req, res) => {
   const file = req.files.image;
   try {
-    // console.log(file);
-
-    // console.log(req.body, "here");
-
     // Create new user
     let data = {
       username: req.body.username,
@@ -29,17 +26,7 @@ router.post("/register", validEmail, async (req, res) => {
       image_url: req.body.image,
       cloudinary_id: req.body.image,
     };
-    // req.on('data', (data, any) => {
-    //   console.log(data.toString());
-    //   });
 
-    //   req.on('end', () => {
-    //   res.json({
-    //   fileUpload: 'successful'
-    //   });
-    //   });
-
-    // Save user
     const user = await pool.query("SELECT * FROM job_seeker WHERE email = $1", [
       data.email,
     ]);
@@ -56,7 +43,7 @@ router.post("/register", validEmail, async (req, res) => {
         return res.status(500).json(error);
       }
 
-      // Upload image to cloudinary
+      // Upload image to cloudinary and save user into the database
       cloudinary.uploader
         .upload(file.tempFilePath)
         .then((image) => {
@@ -74,7 +61,6 @@ router.post("/register", validEmail, async (req, res) => {
             image.public_id,
           ];
 
-          // execute query
           pool
             .query(insertQuery, values)
             .then((result) => {
@@ -82,7 +68,6 @@ router.post("/register", validEmail, async (req, res) => {
 
               const token = jwtGenerator(newUser.user_id);
 
-              // send success response
               return res.status(201).send({
                 status: "success",
                 data: {
@@ -93,14 +78,14 @@ router.post("/register", validEmail, async (req, res) => {
             })
             .catch((e) => {
               return res.status(500).send({
-                message: "failure 1",
+                message: "Failed to upload image!",
                 e,
               });
             });
         })
         .catch((error) => {
           return res.status(500).send({
-            message: "failure 2",
+            message: "Failed to register user!",
             error,
           });
         });
@@ -110,6 +95,7 @@ router.post("/register", validEmail, async (req, res) => {
   }
   pool.end;
 });
+
 
 // login route
 router.post("/login", validEmail, async (req, res) => {

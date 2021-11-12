@@ -53,7 +53,7 @@ router.post("/register", validEmail, async (req, res) => {
 
     await bcrypt.hash(data.password, saltRounds, (error, hash) => {
       if (error) {
-        res.status(500).json(error);
+        return res.status(500).json(error);
       }
 
       // Upload image to cloudinary
@@ -83,7 +83,7 @@ router.post("/register", validEmail, async (req, res) => {
               const token = jwtGenerator(newUser.user_id);
 
               // send success response
-              res.status(201).send({
+              return res.status(201).send({
                 status: "success",
                 data: {
                   newUser,
@@ -92,21 +92,21 @@ router.post("/register", validEmail, async (req, res) => {
               });
             })
             .catch((e) => {
-              res.status(500).send({
+              return res.status(500).send({
                 message: "failure 1",
                 e,
               });
             });
         })
         .catch((error) => {
-          res.status(500).send({
+          return res.status(500).send({
             message: "failure 2",
             error,
           });
         });
     });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    return res.status(400).json({ message: err.message });
   }
   pool.end;
 });
@@ -120,29 +120,29 @@ router.post("/login", validEmail, async (req, res) => {
     ]);
 
     if (user.rows.length === 0) {
-      res
+      return res
         .status(401)
         .json({ error: "No user with that email found...Kindly signup!" });
     }
 
     bcrypt.compare(password, user.rows[0].password, (error, match) => {
       if (error) {
-        res.status(500).json(error);
+        return res.status(500).json(error);
       }
       if (match) {
-        res.status(200).json({
+        return res.status(200).json({
           message: "Success!",
           token: jwtGenerator(user.rows[0].user_id),
         });
       } else {
-        res.status(400).json({
+        return res.status(400).json({
           error: "Passwords do not match... Kindly enter a valid password!",
         });
       }
     });
   } catch (err) {
     // console.error(err.message);
-    res.status(500).json(err.message);
+    return res.status(500).json(err.message);
   }
 });
 

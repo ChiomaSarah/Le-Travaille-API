@@ -12,7 +12,7 @@
     "start": "node index.js"
   },
   "keywords": [],
-  "author": "Chioma Osuj",
+  "author": "Chioma Osuji",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.0.1",
